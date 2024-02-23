@@ -1,5 +1,29 @@
 {
   "dependencies": {
-    "node-sass": "^9.0.0"
+    "node-sass": "^9.0.0",
+    "parcel": "^2.11.0"
+  },
+  "name": "forkify",
+  "description": "forkify app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/slow333/2024-complete-javascript-18-forkify-app.git"
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "author": "kim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slow333/2024-complete-javascript-18-forkify-app/issues"
+  },
+  "homepage": "https://github.com/slow333/2024-complete-javascript-18-forkify-app#readme",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.11.0"
   }
 }
