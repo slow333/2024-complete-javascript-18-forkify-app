@@ -1,5 +1,7 @@
 // import icons from '../img/icons.svg'; // parcel 1;
 import icons from 'url:../img/icons.svg'; // parcel 2;
+import 'core-js/stable'; // 다양한 폴리필을 제공
+import 'regenerator-runtime/runtime'
 
 const recipeContainer = document.querySelector('.recipe');
 

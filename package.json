@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "core-js": "^3.36.0",
     "node-sass": "^9.0.0",
-    "parcel": "^2.11.0"
+    "parcel": "^2.11.0",
+    "regenerator-runtime": "^0.14.1"
   },
   "name": "forkify",
   "description": "forkify app",
