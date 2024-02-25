@@ -1,24 +1,16 @@
-import icons from 'url:../img/icons.svg'; // parcel 2;
-import view from './views/recipeView'
+import {API_URL, KEY, KEY2 } from './config';
+import {getJSON} from './helper';
+
 export const state =  {
   recipe: {},
+  searchResult : {
+    query: '',
+    results: []
+  },
 }
 export const loadRecipe = async function(id) {
   try {
-    const key = 'c6a71d97-f8c6-48cd-bc3d-6bdcc665f0c3';
-    const key2 = '9081dcb5-6c8f-404e-a6ce-754cb231a490';
-    const res = await fetch(
-      // 단순 버젼
-      // `https://forkify-api.herokuapp.com/api/v2/recipes?search=${searchRecipe}&key=${key}`
-      // 전체 내용
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${id}?key=${key}`
-      // 전체 레시피 검색은 api에서 막음
-    );
-    if (!res.ok) {
-      view.renderError();
-      throw new Error(`Something happen => ${res.status} ${res.statusText}`);
-    }
-    const data = await res.json();
+    const data = await getJSON(`${API_URL}/${id}?key=${KEY}`)
 
     let { recipe } = data.data;
     state.recipe = {
@@ -32,6 +24,24 @@ export const loadRecipe = async function(id) {
       ingredients: recipe.ingredients
     };
   } catch (err) {
-    console.log(err);
+    console.error('모델에서 발생한 애러 ==> ', err);
+    throw err;
+  }
+}
+export const loadSearchResult = async function(query){
+  try {
+    state.searchResult.query = query
+    const data = await getJSON(`${API_URL}?search=${query}&key=${KEY}`);
+    // https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza&key=<insert your key>
+   state.searchResult.results = data.data.recipes.map(rec => {
+      return {
+        id: rec.id,
+        title: rec.title,
+        publisher: rec.publisher,
+        image: rec.image_url,
+      }
+    })
+  } catch (err) {
+    throw err;
   }
 }

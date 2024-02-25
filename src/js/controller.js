@@ -1,52 +1,54 @@
 import * as model from './model';
-import view from './views/recipeView';
+import recipeView from './views/recipeView';
+import searchView from './views/searchView';
 
 import 'core-js/stable'; // 다양한 폴리필을 제공
-import 'regenerator-runtime/runtime'
+import 'regenerator-runtime/runtime';
+import { getJSON } from './helper';
+import { API_URL, KEY,KEY2 } from './config';
 
-const timeout = function(s) {
-  return new Promise(function(_, reject) {
-    setTimeout(function() {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
-// https://forkify-api.herokuapp.com/v2
-
-///////////////////////////////////////
-//GET: Returns a single recipe
-// DELETE: Deletes a single recipe associated with provided API key
-// Path:https://forkify-api.herokuapp.com/api/v2/recipes/:id
-
-const showRecipe = async function() {
+const controlRecipes = async function() {
   try {
     // 1) loading recipe
     const id = window.location.hash.slice(1);
     console.log(id);
-    if(!id) return;
+    if (!id) return;
 
-    view.renderSpinner()
+    // 2) load recipe
+    recipeView.renderSpinner();
 
-    let recipe;
-    await Promise.race([
-        timeout(0.0001),
-        await model.loadRecipe(id),
-      ]
-    ).then(res => {
-      recipe = model.state.recipe
-    }).catch(err => console.log('from race error => ', err.message));
+    await model.loadRecipe(id);
 
-    // const {recipe} = model.state;
-    console.log(recipe);
+    // 3) render recipe
+    recipeView.render(model.state.recipe);
 
-    // 2) render recipe
-    view.render();
-
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    recipeView.renderError()
   }
 };
 
-['hashchange', 'load'].forEach(ev => window.addEventListener(ev, showRecipe))
-// window.addEventListener('hashchange', showRecipe);
+const controlSearchResults = async function() {
+  try{
+    // 1. get search query
+    const query = searchView.getQuery();
+    if(!query) return;
+
+    // 2. load search results
+    await model.loadSearchResult(query)
+
+    // 3. render results
+    // console.log(model.state.searchResult.results);
+    model.state.searchResult.results.forEach(result => {
+      searchView.renderSearchResults(result)
+    })
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const init = function() {
+  recipeView.addHandlerRender(controlRecipes);
+  searchView.addHandlerSearch(controlSearchResults)
+};
+init();
