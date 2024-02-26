@@ -1,77 +1,20 @@
 // import icons from '../../img/icons.svg'; // parcel 1;
+import View from './View.js';
+
 import icons from 'url:../../img/icons.svg'; // parcel 2;
 
-class RecipeView {
-  #parentEl = document.querySelector('.recipe');
-  #errorMessage = '찾는 레시피가 없습니다. 다시해봐요.🤩🤩🤩';
-  #message = '좋아하는 레시피를 찾아 보세요.  🤣🤣🤣';
-  #btnSearch =document.querySelector('.search__btn');
-  #seachStr = document.querySelector('.search__field');
-
-  render(recipe) {
-    const markup = this.#recipeMarkup(recipe);
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML('afterbegin', markup);
-  }
-
-  renderSpinner() {
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML('afterbegin', this.#spinnerMarkup())
-  };
-
-  renderMessage(message = this.#message) {
-    const markup = `
-      <div class="message">
-        <div>
-          <svg>
-            <use href="${icons}#icon-smile"></use>
-          </svg>
-        </div>
-        <p>${message}</p>
-      </div>
-    `;
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML('afterbegin', markup);
-  }
-
-  renderError(message) {
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML('afterbegin', this.#errorMarkup(message));
-    // document.querySelector('.spinner').remove();
-    // window.location.reload();
-  }
+class RecipeView extends View{
+  _parentEl = document.querySelector('.recipe');
+  _errorMessage = '찾는 레시피가 없습니다. 다시해봐요.🤩🤩🤩';
+  _message = '좋아하는 레시피를 찾아 보세요.  🤣🤣🤣';
 
   addHandlerRender(handler){
     ['hashchange', 'load']
       .forEach(ev => window.addEventListener(ev, handler));
   }
 
-  #spinnerMarkup = function() {
-    return `
-      <div class="spinner">
-        <svg>
-          <use href="${icons}#icon-loader"></use>
-        </svg>
-      </div>
-    `
-  };
-
-  #errorMarkup(message = this.#errorMessage) {
-    return `
-       <div class="error">
-        <div>
-          <svg>
-            <use href="${icons}#icon-alert-triangle"></use>
-          </svg>
-        </div>
-        <p>${message}</p>
-      </div>
-    `
-  };
-  #clear() {
-    this.#parentEl.innerHTML = '';
-  }
-  #recipeMarkup(recipe) {
+  _generateMarkup() {
+    const recipe = this._data;
     return `
     <figure class="recipe__fig">
       <img src="${recipe.image}" alt="${recipe.title}" class="recipe__img" />
