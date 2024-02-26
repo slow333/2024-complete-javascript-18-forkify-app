@@ -41,7 +41,7 @@ const controlSearchResults = async function() {
     await model.loadSearchResults(query);
 
     // 3. render results
-    resultsView.render(model.getSearchResultsPage(3));
+    resultsView.render(model.getSearchResultsPage());
 
     // 4. 초기 버튼 정하기
     pagenationView.render(model.state.searchResult)
@@ -50,9 +50,18 @@ const controlSearchResults = async function() {
     console.log(err);
   }
 }
+const controlPagenation = function(goToPage) {
+  // 1. render NEW results
+  resultsView.render(model.getSearchResultsPage(goToPage));
+
+  // 2. render NEW pagenation button
+  pagenationView.render(model.state.searchResult)
+
+};
 
 const init = function() {
   recipeView.addHandlerRender(controlRecipes);
-  searchView.addHandlerSearch(controlSearchResults)
+  searchView.addHandlerSearch(controlSearchResults);
+  pagenationView.addHandlerClick(controlPagenation);
 };
 init();
