@@ -7,10 +7,28 @@ class RecipeView extends View{
   _parentEl = document.querySelector('.recipe');
   _errorMessage = '찾는 레시피가 없습니다. 다시해봐요.🤩🤩🤩';
   _message = '좋아하는 레시피를 찾아 보세요.  🤣🤣🤣';
+  _recipeInfoBtn = document.querySelector('.recipe__info-buttons')
 
   addHandlerRender(handler){
     ['hashchange', 'load']
       .forEach(ev => window.addEventListener(ev, handler));
+  }
+
+  addHandlerUpdateServings(handler) {
+    this._parentEl.addEventListener('click', function(ev) {
+      const btn = ev.target.closest('.btn--tiny');
+      if(!btn) return;
+      const { updateServings } = btn.dataset;
+      if(+updateServings > 0) handler(+updateServings);
+    });
+  }
+
+  addHandlerAddBookmark(handler) {
+    this._parentEl.addEventListener('click', function(ev) {
+      const btn = ev.target.closest('.btn--bookmark');
+      if(!btn) return;
+      handler();
+    });
   }
 
   _generateMarkup() {
@@ -39,12 +57,12 @@ class RecipeView extends View{
         <span class="recipe__info-text">servings</span>
 
         <div class="recipe__info-buttons">
-          <button class="btn--tiny btn--increase-servings">
+          <button data-update-servings="${recipe.servings -1}" class="btn--tiny btn--decrease-servings">
             <svg>
               <use href="${icons}#icon-minus-circle"></use>
             </svg>
           </button>
-          <button class="btn--tiny btn--increase-servings">
+          <button data-update-servings="${recipe.servings +1}" class="btn--tiny btn--increase-servings">
             <svg>
               <use href="${icons}#icon-plus-circle"></use>
             </svg>
@@ -57,9 +75,9 @@ class RecipeView extends View{
           <use href="${icons}#icon-user"></use>
         </svg>
       </div>
-      <button class="btn--round">
+      <button class="btn--round btn--bookmark">
         <svg class="">
-          <use href="${icons}#icon-bookmark-fill"></use>
+          <use href="${icons}#icon-bookmark${this._data.bookmarked ? '-fill': ''}"></use>
         </svg>
       </button>
     </div>

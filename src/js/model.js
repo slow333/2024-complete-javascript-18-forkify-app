@@ -9,10 +9,11 @@ export const state =  {
     page: 1,
     resultPerPage: RES_PER_PAGE,
   },
+  bookmarks: [],
 }
 export const loadRecipe = async function(id) {
   try {
-    const data = await getJSON(`${API_URL}/${id}?key=${KEY}`)
+    const data = await getJSON(`${API_URL}/${id}?key=${KEY2}`)
 
     let { recipe } = data.data;
     state.recipe = {
@@ -25,6 +26,10 @@ export const loadRecipe = async function(id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients
     };
+    if(state.bookmarks.some(b => b.id === id))
+      state.recipe.bookmarked = true;
+    else
+      state.recipe.bookmarked = false;
   } catch (err) {
     console.error('모델에서 발생한 애러 ==> ', err);
     throw err;
@@ -42,7 +47,8 @@ export const loadSearchResults = async function(query){
         image: rec.image_url,
       }
     });
-    console.log(data);
+    state.searchResult.page = 1;
+
   } catch (err) {
     throw err;
   }
@@ -53,4 +59,18 @@ export const getSearchResultsPage = function(page = state.searchResult.page) {
   const start  = (page - 1) * state.searchResult.resultPerPage; //0;
   const end = page * state.searchResult.resultPerPage; //9;
   return state.searchResult.results.slice(start, end);
+};
+
+export const updateServings = function(newServings) {
+  state.recipe.ingredients.forEach(ing => {
+    ing.quantity = (ing.quantity * newServings) / state.recipe.servings
+  });
+  state.recipe.servings = newServings
+};
+
+export const addBookmark = function(recipe) {
+  // add bookmark
+  state.bookmarks.push(recipe);
+  // Mark current recipe as bookmark
+  if(recipe.id === state.recipe.id) state.recipe.bookmarked = true;
 };
