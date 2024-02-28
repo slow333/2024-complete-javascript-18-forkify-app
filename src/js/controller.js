@@ -6,7 +6,9 @@ import 'core-js/stable'; // 다양한 폴리필을 제공
 import 'regenerator-runtime/runtime';
 import searchView from './views/searchView';
 import pagenationView from './views/pagenationView';
-import { getSearchResultsPage } from './model';
+import { getSearchResultsPage, loadRecipe, state } from './model';
+import bookmarksView from './views/bookmarksView';
+import addRecipeView from './views/addRecipeView';
 
 if (module.hot) {
   module.hot.accept()
@@ -23,6 +25,7 @@ const controlRecipes = async function() {
 
     // 1) loading recipe
     await model.loadRecipe(id);
+    bookmarksView.update(model.state.bookmarks);
 
     // 3) render recipe
     recipeView.render(model.state.recipe);
@@ -69,16 +72,60 @@ const controlServings = function(newServings) {
 };
 
 const controlAddBookmark = function() {
-  model.addBookmark(model.state.recipe);
-  console.log('선택한 레시피 => ', model.state.recipe);
-  recipeView.update(model.state.recipe)
+  if(!model.state.recipe.bookmarked)
+    model.addBookmark(model.state.recipe);
+  else
+    model.deleteBookmark(model.state.recipe.id);
+
+  // console.log(model.state.bookmarks);
+  // console.log('선택한 레시피 => ', model.state.recipe);
+
+  recipeView.update( model.state.recipe );
+  bookmarksView.render(model.state.bookmarks);
 };
+
+const controlBookmarks = function() {
+  bookmarksView.render(model.state.bookmarks);
+};
+
+const controlAddRecipe = async (newRecipe) => {
+  try {
+    // show spinner
+    addRecipeView.renderSpinner();
+    // upload recipe
+    await model.uploadRecipe(newRecipe);
+    console.log(model.state.recipe);
+
+    // render uploaded recipe
+    recipeView.render(model.state.recipe);
+
+    // render success message
+    addRecipeView.renderMessage();
+
+    // Render bookmark view
+    bookmarksView.render(model.state.bookmarks)
+
+    // Change ID url
+    window.history.pushState(null, '', `#${model.state.recipe.id}`)
+
+    setTimeout(function() {
+      // close window form
+      addRecipeView.toggleWindow();
+    }, 2000);
+  } catch (err) {
+    console.error('💥💥💥', err);
+    addRecipeView.renderError(err.message);
+  }
+};
+
 const init = function() {
+  bookmarksView.addHandlerRender(controlBookmarks)
   recipeView.addHandlerRender(controlRecipes);
   recipeView.addHandlerUpdateServings(controlServings);
   recipeView.addHandlerAddBookmark(controlAddBookmark);
 
   searchView.addHandlerSearch(controlSearchResults);
   pagenationView.addHandlerClick(controlPagenation);
+  addRecipeView.addHandlerUpload(controlAddRecipe);
 };
 init();
